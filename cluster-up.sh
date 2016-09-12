@@ -2,6 +2,12 @@
 
 set -ex
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "[OS X] Prepare VM for Docker..."
+    docker-machine start
+    eval $(docker-machine env)
+fi
+
 start_node() {
   docker run -d --name=$1 --hostname=$1 $2 -e "ES_HEAP_SIZE=512m" lis0x90/elasticsearch-flex \
      /usr/share/elasticsearch/bin/elasticsearch \
