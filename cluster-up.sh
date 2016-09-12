@@ -3,9 +3,12 @@
 set -ex
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "[OS X] Prepare VM for Docker..."
-    docker-machine start
-    eval $(docker-machine env)
+    st=`docker-machine status`
+    if [[ ${st} != "Running"  ]]; then
+        echo "[OS X] Prepare VM for Docker..."
+        docker-machine start
+        eval $(docker-machine env)
+    fi
 fi
 
 start_node() {
@@ -17,14 +20,14 @@ start_node() {
        --node.name=$1 --cluster.name=esaas ${@:3}
 }
 
-start_node esmaster1 "-p 9201:9200" --node.master=true --node.data=false --discovery.zen.minimum_master_nodes=2 --path.data=/tmp/
-start_node esmaster2 "-p 9202:9200" --node.master=true --node.data=false --discovery.zen.minimum_master_nodes=2 --path.data=/tmp/
-start_node esmaster3 "-p 9203:9200" --node.master=true --node.data=false --discovery.zen.minimum_master_nodes=2 --path.data=/tmp/
+start_node es-master1 "-p 9201:9200" --node.master=true --node.data=false --discovery.zen.minimum_master_nodes=2 --path.data=/tmp/
+start_node es-master2 "-p 9202:9200" --node.master=true --node.data=false --discovery.zen.minimum_master_nodes=2 --path.data=/tmp/
+start_node es-master3 "-p 9203:9200" --node.master=true --node.data=false --discovery.zen.minimum_master_nodes=2 --path.data=/tmp/
 
 
 mkdir -p /tmp/es/{1,2,3}
-start_node esdata1 "-p 9211:9200 -v /tmp/es/1:/data" --node.master=false --node.data=true --path.data=/data
-start_node esdata2 "-p 9212:9200 -v /tmp/es/2:/data" --node.master=false --node.data=true --path.data=/data
-start_node esdata3 "-p 9213:9200 -v /tmp/es/3:/data" --node.master=false --node.data=true --path.data=/data
+start_node es-data1 "-p 9211:9200 -v /tmp/es/1:/data" --node.master=false --node.data=true --path.data=/data
+start_node es-data2 "-p 9212:9200 -v /tmp/es/2:/data" --node.master=false --node.data=true --path.data=/data
+start_node es-data3 "-p 9213:9200 -v /tmp/es/3:/data" --node.master=false --node.data=true --path.data=/data
 
-start_node esclient "-p 9200:9200 -p 9300:9300" --node.master=false --node.data=false
+start_node es-client "-p 9200:9200 -p 9300:9300" --node.master=false --node.data=false
